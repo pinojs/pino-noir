@@ -1,4 +1,4 @@
-# pino-noir
+# pino-noir 🍾🍷
 
 Redact sensitive information from your pino logs.
 
