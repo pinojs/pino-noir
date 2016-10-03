@@ -1,9 +1,10 @@
-# pino-noir 🍾🍷
+# pino-noir 
 
 Redact sensitive information from your pino logs.
+    
+🍾🍷
 
 [![codecov](https://codecov.io/gh/davidmarkclements/pino-noir/branch/master/graph/badge.svg)](https://codecov.io/gh/davidmarkclements/pino-noir)
-
 
 ## API
 
