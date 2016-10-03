@@ -1,18 +1,20 @@
 'use strict'
-var group = require('lodash.groupBy')
+
 var DEFAULT_CENSOR = '[Redacted]'
-var rxProp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g
-var rxEsc = /\\(\\)?/g
-var reIsUint = /^(?:0|[1-9]\d*)$/
+var rxProp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g
 
 function noir (keys, censor) {
   if (arguments.length < 2) {
     censor = DEFAULT_CENSOR
   }
 
-  var shape = group(keys.map(strToPath), function (p) {
-    return p[0]
-  })
+  var shape = keys.map(strToPath).reduce(function (o, p) {
+    var k = p[0]
+    if (!o[k]) o[k] = []
+    o[k].push(p)
+    return o
+  }, {})
+
   var tops = Object.keys(shape)
   for (var i = 0; i < tops.length; i++) {
     if (shape[tops[i]].some(function (a) { return a.length === 1 })) {
@@ -27,17 +29,24 @@ function noir (keys, censor) {
   function redact () { return {toJSON: mask} }
   function mask () { return censor }
 
-  // the returned object is immediately JSON.stringified,
-  // https://github.com/mcollina/pino/blob/master/pino.js#L224-L225
-  // this means we can leverage the JSON.stringify loop
-  // print redacted, and replace with original value (cheap),
-  // instead of copying the object and stripping values (expensive)
-  // the Redacted constructor is used because it allows for
-  // quick triggering of hidden class optimization
-
-  /*eslint no-labels: 0*/
+  // we use eval to pre-compile the redactor function
+  // this gives us up 100's of ms (per 10000ops) in some
+  // cases (deep nesting, wildcards). This is certainly
+  // safe in this case, there is not user input here.
+  /* eslint no-eval: 0 */
   function factory (paths) {
-    return function redactor (o) {
+    var redactor
+    eval(`redactor = function redactor (o) {
+      return redact(o, ${JSON.stringify(paths)})
+    }`)
+    redact() // shh linter
+    return redactor
+
+    // redact is too big to inline,
+    // can be made smaller by making unreadable,
+    // but doesn't seem to improve benchmarks
+    function redact (o, paths) {
+      if (o == null) return o
       var i = 0
       var len = paths.length
       var path
@@ -48,7 +57,8 @@ function noir (keys, censor) {
       var pathIndex
       var terminus
       var cur
-      outer:
+      var pre
+      var red
       for (; i < len; i++) {
         path = paths[i]
         pathIndex = 0
@@ -57,16 +67,19 @@ function noir (keys, censor) {
         cur = o
         while (cur != null && pathIndex < terminus) {
           k = path[pathIndex++]
-          if (k === '*') {
-            redactAll(cur, censor)
-            continue outer
-          }
+          pre = cur
           cur = cur[k]
         }
         parent = (pathIndex && pathIndex === terminus) ? cur : o
+        if (!parent) continue
         k = path[pathIndex]
         if (k === '*') {
-          redactAll(parent, censor)
+          red = redactAll(parent, censor)
+          if (red && parent === o) o = censor
+          else if (red) {
+            path.length = pathIndex
+            set(o, path, new Redacted(val, path[pathIndex - 1], pre, censor))
+          }
           continue
         }
         val = parent[k]
@@ -79,59 +92,56 @@ function noir (keys, censor) {
 }
 
 function redactAll (object, censor) {
-  if (object == null) return
+  if (typeof object !== 'object') {
+    return true
+  }
   Object.keys(object).reduce(function (o, k) {
     o[k] = new Redacted(o[k], k, object, censor)
     return o
   }, object)
 }
 
-/*eslint no-self-compare: 0*/
-function set (object, path, value) {
-  var index = -1
-  var length = path.length
-  var lastIndex = length - 1
-  var nested = object
-  var key
-  var type
-  var isObject
-  var newValue
-  var objValue
-  var nxt
-  var assign
-  while (nested != null && ++index < length) {
-    key = path[index]
-    type = typeof nested
-    isObject = !!nested && (type === 'object' || type === 'function')
-    if (isObject) {
-      newValue = value
-      if (index !== lastIndex) {
-        objValue = nested[key]
-        nxt = path[index + 1]
-        newValue = objValue == null
-          ? (typeof nxt === 'number' || reIsUint.test(nxt)) && (nxt > -1 && nxt % 1 === 0) ? [] : {}
-          : objValue
-      }
-      objValue = nested[key]
-      assign = !(
-        nested.hasOwnProperty(key) &&
-        newValue === objValue || (newValue !== newValue && objValue !== objValue) ||
-          newValue === undefined && !(key in nested)
-      )
-      if (assign) { nested[key] = newValue }
-    }
-    nested = nested[key]
+// set was a hot path and bottleneck,
+// had to make the function small enough
+// to inline, hence the algebra.
+// o = object, p = path, v = value,
+// i = index, l = length, li = lastIndex,
+// n = nested, k = key, nv = newValue, ov = objValue
+/* eslint no-self-compare: 0 */
+function set (o, p, v) {
+  var i = -1
+  var l = p.length
+  var li = l - 1
+  var n = o
+  var k
+  var nv
+  var ov
+  while (n != null && ++i < l) {
+    k = p[i]
+    nv = v
+    ov = n[k]
+    nv = (i !== li) ? ov : nv
+    n[k] = (n.hasOwnProperty(k) && nv === ov || nv === undefined) ? n[k] : nv
+    n = n[k]
   }
-  return object
+  return o
 }
 
 function strToPath (s) {
   var result = []
-  ;(s + '').replace(rxProp, function (match, number, quote, s) {
-    result.push(quote ? s.replace(rxEsc, '$1') : (number || match))
+  ;(s + '').replace(rxProp, function (match, number) {
+    result.push(number || match)
   })
   return result
 }
+
+// the returned object is immediately JSON.stringified,
+// https://github.com/mcollina/pino/blob/master/pino.js#L224-L225
+// this means we can leverage the JSON.stringify loop
+// print redacted, and replace with original value (cheap),
+// instead of copying the object and stripping values (expensive)
+// the Redacted constructor is used because it allows for
+// quick triggering of hidden class optimization
 
 function Redacted (val, key, parent, censor) {
   this.val = val
@@ -146,4 +156,3 @@ Redacted.prototype.toJSON = function toJSON () {
 }
 
 module.exports = noir
-

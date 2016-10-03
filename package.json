@@ -1,13 +1,15 @@
 {
   "name": "pino-noir",
   "version": "0.0.1",
-  "description": "",
+  "description": "Redact information from your pino logs.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "standard && tap test"
+    "test": "standard && tap test",
+    "cov-badge": "tap --coverage-report=lcov && codecov -t 346eeb5b-38b7-4ff5-b0ec-eb2da6a1254f",
+    "cov": "tap test --cov"
   },
   "repository": {
     "type": "git",
@@ -19,17 +21,12 @@
     "url": "https://github.com/davidmarkclements/pino-noir/issues"
   },
   "homepage": "https://github.com/davidmarkclements/pino-noir#readme",
-  "dependencies": {
-    "get": "^1.4.0",
-    "lodash.get": "^4.4.0",
-    "lodash.groupby": "^4.5.0",
-    "lodash.set": "^4.3.0",
-    "lodash.topath": "^4.5.0",
-    "set": "^1.1.1",
-    "standard": "^7.1.2",
-    "tap": "^6.2.0"
-  },
   "devDependencies": {
-    "pino": "^2.7.5"
+    "codecov": "^1.0.1",
+    "fast-safe-stringify": "^1.1.0",
+    "fastbench": "^1.0.1",
+    "pino": "v2.12.1",
+    "standard": "^8.2.0",
+    "tap": "^6.2.0"
   }
 }
