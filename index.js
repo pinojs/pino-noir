@@ -36,9 +36,7 @@ function noir (keys, censor) {
   /* eslint no-eval: 0 */
   function factory (paths) {
     var redactor
-    eval(`redactor = function redactor (o) {
-      return redact(o, ${JSON.stringify(paths)})
-    }`)
+    eval('redactor = function redactor (o) { return redact(o, ' + JSON.stringify(paths) + ') }')
     redact() // shh linter
     return redactor
 
