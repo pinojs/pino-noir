@@ -26,7 +26,7 @@ an object. For instance `a.b.*` applied to the object `{a: b: {c: 'foo', d: 'bar
 
 The `censor` can be of any type, for instance an object like `{redacted: true}`
 is allowed, as is `null`. Explicitly passing `undefined` as the `censor` will
-in most cases cause the property to be stripped from the object. Edge cases occur when an array key is redacted, in which case `null` will appear in the array (this is ultimately a nuance of `JSON.stringify`, try `JSON.stringify('a', undefined, 'c')`)
+in most cases cause the property to be stripped from the object. Edge cases occur when an array key is redacted, in which case `null` will appear in the array (this is ultimately a nuance of `JSON.stringify`, try `JSON.stringify(['a', undefined, 'c'])`)
 
 ## Example
 
