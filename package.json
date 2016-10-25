@@ -1,6 +1,6 @@
 {
   "name": "pino-noir",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Redact sensitive information from your pino logs. ",
   "main": "index.js",
   "directories": {
