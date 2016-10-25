@@ -11,16 +11,8 @@
     "cov-badge": "tap --coverage-report=lcov && codecov -t 346eeb5b-38b7-4ff5-b0ec-eb2da6a1254f",
     "cov": "tap test --cov"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/davidmarkclements/pino-noir.git"
-  },
   "author": "David Mark Clements",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/davidmarkclements/pino-noir/issues"
-  },
-  "homepage": "https://github.com/davidmarkclements/pino-noir#readme",
   "devDependencies": {
     "codecov": "^1.0.1",
     "fast-safe-stringify": "^1.1.0",
@@ -28,5 +20,14 @@
     "pino": "v2.12.1",
     "standard": "^8.2.0",
     "tap": "^6.2.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pinojs/pino-noir.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/pinojs/pino-noir/issues"
+  },
+  "homepage": "https://github.com/pinojs/pino-noir#readme"
 }
