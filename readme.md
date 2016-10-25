@@ -4,7 +4,7 @@ Redact sensitive information from your pino logs.
     
 🍾🍷
 
-[![codecov](https://codecov.io/gh/davidmarkclements/pino-noir/branch/master/graph/badge.svg)](https://codecov.io/gh/davidmarkclements/pino-noir)
+[![codecov](https://codecov.io/gh/pinojs/pino-noir/branch/master/graph/badge.svg)](https://codecov.io/gh/pinojs/pino-noir)
 
 ## API
 
