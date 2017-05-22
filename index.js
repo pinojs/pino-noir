@@ -105,7 +105,7 @@ function redactAll (object, censor) {
 // o = object, p = path, v = value,
 // i = index, l = length, li = lastIndex,
 // n = nested, k = key, nv = newValue, ov = objValue
-/* eslint no-self-compare: 0 */
+/* eslint no-self-compare: 0, no-mixed-operators: 0 */
 function set (o, p, v) {
   var i = -1
   var l = p.length
@@ -152,5 +152,7 @@ Redacted.prototype.toJSON = function toJSON () {
   this.parent[this.key] = this.val
   return this.censor
 }
+
+Redacted.prototype.toJSON.forceDecirc = true
 
 module.exports = noir
