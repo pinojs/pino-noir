@@ -3,8 +3,12 @@
 var DEFAULT_CENSOR = '[Redacted]'
 var rxProp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g
 
-function noir (keys, censor) {
-  if (arguments.length < 2) {
+function noir (serializers, keys, censor) {
+  if (Array.isArray(serializers)) {
+    censor = arguments.length === 2 ? keys : DEFAULT_CENSOR
+    keys = serializers
+    serializers = {}
+  } else if (arguments.length === 2) {
     censor = DEFAULT_CENSOR
   }
 
@@ -15,15 +19,30 @@ function noir (keys, censor) {
     return o
   }, {})
 
-  var tops = Object.keys(shape)
-  for (var i = 0; i < tops.length; i++) {
-    if (shape[tops[i]].some(function (a) { return a.length === 1 })) {
-      shape[tops[i]] = redact
-      continue
+  Object.keys(shape).forEach(function (top) {
+    if (shape[top].some(function (a) { return a.length === 1 })) {
+      shape[top] = redact
+    } else {
+      shape[top].forEach(function (a) { a.shift() })
+      shape[top] = factory(shape[top])
     }
-    shape[tops[i]].forEach(function (a) { a.shift() })
-    shape[tops[i]] = factory(shape[tops[i]])
-  }
+
+    var prev = shape[top]
+    var serializer = serializers[top]
+    if (serializer) {
+      shape[top] = function (obj) {
+        var intermediate = serializer(obj)
+        return prev(intermediate)
+      }
+    }
+  })
+
+  Object.keys(serializers).forEach(function (top) {
+    if (!shape[top]) {
+      shape[top] = serializers[top]
+    }
+  })
+
   return shape
 
   function redact () { return {toJSON: mask} }

@@ -1,7 +1,7 @@
-# pino-noir 
+# pino-noir
 
 Redact sensitive information from your pino logs.
-    
+
 🍾🍷
 
 [![codecov](https://codecov.io/gh/pinojs/pino-noir/branch/master/graph/badge.svg)](https://codecov.io/gh/pinojs/pino-noir)
@@ -9,14 +9,13 @@ Redact sensitive information from your pino logs.
 ## API
 
 ```js
-noir(paths = [], censor = '[Redacted]') => {Pino Serializer Object}
+noir([serializers = {}], paths = [], censor = '[Redacted]') => {Pino Serializer Object}
 ```
-
 ### `paths`
 
-The `paths` parameter should be an array of strings, describing the nested location of a key in an object. 
+The `paths` parameter should be an array of strings, describing the nested location of a key in an object.
 
-The path can be represented in dot notation, `a.b.c`, and/or bracket notation 
+The path can be represented in dot notation, `a.b.c`, and/or bracket notation
 `a[b[c]]`, `a.b[c]`, `a[b].c`.
 
 Paths also supports the asterisk wildcard (`*`) to redact all keys within
@@ -27,6 +26,13 @@ an object. For instance `a.b.*` applied to the object `{a: b: {c: 'foo', d: 'bar
 The `censor` can be of any type, for instance an object like `{redacted: true}`
 is allowed, as is `null`. Explicitly passing `undefined` as the `censor` will
 in most cases cause the property to be stripped from the object. Edge cases occur when an array key is redacted, in which case `null` will appear in the array (this is ultimately a nuance of `JSON.stringify`, try `JSON.stringify(['a', undefined, 'c'])`)
+
+### `serializers` (optional)
+
+An object containing a previous
+[serializers](https://github.com/pinojs/pino/blob/master/docs/API.md#example) object. The output of those
+serializers will be redacted. In this way it is possible to chain
+standard serializers with pino-noir.
 
 ## Example
 
