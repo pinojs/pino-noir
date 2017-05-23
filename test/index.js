@@ -125,3 +125,36 @@ test('edge cases', function (t) {
   t.is(stringify(noir(['deep.bar.baz.ding']).deep(undefined)), undefined)
   t.end()
 })
+
+test('redacts nested keys with a custom serializers', function (t) {
+  t.plan(2)
+  var fixture = {
+    something: 'else'
+  }
+  var serializers = noir({
+    test: function (obj) {
+      t.is(fixture, obj)
+      return {
+        test1: 'should be redacted',
+        a: 1
+      }
+    }
+  }, ['test.test1'])
+  t.is(stringify(serializers.test(fixture)), '{"test1":"[Redacted]","a":1}')
+})
+
+test('pass through existing serializers', function (t) {
+  t.plan(2)
+  var fixture = {
+    something: 'else'
+  }
+  var serializers = noir({
+    test: function (obj) {
+      t.is(fixture, obj)
+      return {
+        a: 1
+      }
+    }
+  }, ['to.be.redacted'])
+  t.is(stringify(serializers.test(fixture)), '{"a":1}')
+})
