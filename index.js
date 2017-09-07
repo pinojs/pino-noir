@@ -2,6 +2,8 @@
 
 var DEFAULT_CENSOR = '[Redacted]'
 var rxProp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g
+var parentSymbol = Symbol('parent')
+var valSymbol = Symbol('val')
 
 function noir (serializers, keys, censor) {
   if (Array.isArray(serializers)) {
@@ -171,7 +173,5 @@ Redacted.prototype.toJSON = function toJSON () {
   this.parent[this.key] = this.val
   return this.censor
 }
-
-Redacted.prototype.toJSON.forceDecirc = true
 
 module.exports = noir
