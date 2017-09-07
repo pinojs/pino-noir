@@ -69,8 +69,8 @@ test('handles circulars', function (t) {
   prev.baz = prev
   o.bar.baz = o.bar
   t.is(stringify(serializers.deep(o)), '{"a":1,"bar":{"b":"[Redacted]","baz":"[Redacted]"}}')
-  t.deepEqual(o.bar, prev) 
-  t.deepEqual(o.bar.baz, prev) 
+  t.deepEqual(o.bar, prev)
+  t.deepEqual(o.bar.baz, prev)
   t.end()
 })
 
@@ -81,8 +81,8 @@ test('handles deep circulars', function (t) {
   prev.baz.ding = prev
   o.bar.baz.ding = o.bar
   t.is(stringify(serializers.deep(o)), '{"a":1,"bar":{"b":"[Redacted]","baz":"[Redacted]"}}')
-  t.deepEqual(o.bar, prev) 
-  t.deepEqual(o.bar.baz.ding, prev) 
+  t.deepEqual(o.bar, prev)
+  t.deepEqual(o.bar.baz.ding, prev)
   t.end()
 })
 
