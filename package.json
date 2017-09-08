@@ -14,10 +14,12 @@
   "author": "David Mark Clements",
   "license": "MIT",
   "devDependencies": {
+    "clone": "^2.1.1",
     "codecov": "^2.2.0",
     "fast-safe-stringify": "^1.2.0",
     "fastbench": "^1.0.1",
     "pino": "^4.0.0",
+    "pre-commit": "^1.2.2",
     "standard": "^10.0.0",
     "tap": "^10.0.0"
   },

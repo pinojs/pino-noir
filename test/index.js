@@ -2,6 +2,7 @@
 
 var test = require('tap').test
 var stringify = require('fast-safe-stringify')
+var clone = require('clone')
 var noir = require('../')
 
 test('redacts top level keys', function (t) {
@@ -62,19 +63,26 @@ test('wild cards overwrite primitives', function (t) {
 })
 
 test('handles circulars', function (t) {
-  var serializers = noir(['deep.bar.baz.ding.*'])
-  var o = {a: 1, bar: {b: 2, baz: {c: 3}}}
-  o.bar.baz.ding = o.bar
+  var serializers = noir(['deep.bar.baz.*'])
+  var o = {a: 1, bar: {b: 2}}
+  var prev = clone(o.bar)
+  prev.baz = prev
+  o.bar.baz = o.bar
   t.is(stringify(serializers.deep(o)), '{"a":1,"bar":{"b":"[Redacted]","baz":"[Redacted]"}}')
+  t.deepEqual(o.bar, prev)
+  t.deepEqual(o.bar.baz, prev)
   t.end()
 })
 
-test('handles multi circulars', function (t) {
+test('handles deep circulars', function (t) {
   var serializers = noir(['deep.bar.baz.ding.*'])
-  var o = {a: '', bar: {b: 2, baz: {c: 3}}}
+  var o = {a: 1, bar: {b: 2, baz: {c: 3}}}
+  var prev = clone(o.bar)
+  prev.baz.ding = prev
   o.bar.baz.ding = o.bar
-  o.a = o.bar
-  t.is(stringify(serializers.deep(o)), '{"a":{"b":"[Redacted]","baz":"[Redacted]"},"bar":{"b":"[Redacted]","baz":"[Redacted]"}}')
+  t.is(stringify(serializers.deep(o)), '{"a":1,"bar":{"b":"[Redacted]","baz":"[Redacted]"}}')
+  t.deepEqual(o.bar, prev)
+  t.deepEqual(o.bar.baz.ding, prev)
   t.end()
 })
 

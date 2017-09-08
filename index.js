@@ -172,6 +172,4 @@ Redacted.prototype.toJSON = function toJSON () {
   return this.censor
 }
 
-Redacted.prototype.toJSON.forceDecirc = true
-
 module.exports = noir
