@@ -27,6 +27,8 @@ The `censor` can be of any type, for instance an object like `{redacted: true}`
 is allowed, as is `null`. Explicitly passing `undefined` as the `censor` will
 in most cases cause the property to be stripped from the object. Edge cases occur when an array key is redacted, in which case `null` will appear in the array (this is ultimately a nuance of `JSON.stringify`, try `JSON.stringify(['a', undefined, 'c'])`)
 
+`censor` can also accept a function. This is helpful in cases where you want to redact dynamically instead of a fixed value. A common use case could be to mask partially (e.g. `{ test: 1234567890 }` => `{ "test": "xxxxxx7890" }`). Check the tests to see this in action.
+
 ### `serializers` (optional)
 
 An object containing a previous
