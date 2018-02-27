@@ -59,6 +59,17 @@ pino.info({
   also: ['works', {with: 'arrays'}]
 })
 // {"pid":89590,"hostname":"x","level":30,"time":1475104592035,"key":"Ssshh!","path":{"to":{"key":"Ssshh!","another":"thing"},"leading":{"to":{"another":{"key":"Ssshh!"}}}},"check":{"out":"Ssshh!","wildards":"Ssshh!"},"also":["Ssshh!","Ssshh!"],"v":1}
+
+var redaction2 = noir(['key'], (val) => 'was ' + val.substr(-8))
+
+var pino2 = require('pino')({
+  serializers: redaction2
+})
+
+pino2.info({
+  key: 'will be redacted'
+})
+// {"pid":89590,"hostname":"x","level":30,"time":1475104592035,{"key":"was redacted"},"v":1}
 ```
 
 ## Pino Web Loggers
