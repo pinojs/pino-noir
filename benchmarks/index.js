@@ -15,6 +15,8 @@ var pinoVeryDeepNested = pino(dest)
 var noirVeryDeepNested = pino({serializers: noir(['top.very.deep.nested'])}, dest)
 var pinoWildcards = pino(dest)
 var noirWildcards = pino({serializers: noir(['top.deep.*'])}, dest)
+var pinoFunctionCensor = pino(dest)
+var noirFunctionCensor = pino({serializers: noir(['top.nested.*'], (v) => v + '.')}, dest)
 var max = 10
 
 var run = bench([
@@ -75,6 +77,18 @@ var run = bench([
   function benchNoirWildcards (cb) {
     for (var i = 0; i < max; i++) {
       noirWildcards.info({top: {deep: {nested: 'hello world', a: 1}}})
+    }
+    setImmediate(cb)
+  },
+  function benchPinoFunctionCensor (cb) {
+    for (var i = 0; i < max; i++) {
+      pinoFunctionCensor.info({top: {nested: 'hello world'}})
+    }
+    setImmediate(cb)
+  },
+  function benchPinoFunctionCensor (cb) {
+    for (var i = 0; i < max; i++) {
+      noirFunctionCensor.info({top: {nested: 'hello world'}})
     }
     setImmediate(cb)
   }
