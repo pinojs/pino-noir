@@ -108,16 +108,18 @@ server.register({
 Overhead in benchmarks ranges from 0% to 20% depending on the case.
 
 ```
-benchPinoTopLevel*10000: 289.380ms
-benchNoirTopLevel*10000: 288.425ms
-benchPinoNested*10000: 327.763ms
-benchNoirNested*10000: 363.749ms
-benchPinoDeepNested*10000: 377.189ms
-benchNoirDeepNested*10000: 408.555ms
-benchPinoVeryDeepNested*10000: 441.848ms
-benchNoirVeryDeepNested*10000: 503.567ms
-benchPinoWildcardStructure*10000: 395.972ms
-benchNoirWildcards*10000: 476.951ms
+benchPinoTopLevel*10000: 293.869ms
+benchNoirTopLevel*10000: 367.033ms
+benchPinoNested*10000: 463.412ms
+benchNoirNested*10000: 441.725ms
+benchPinoDeepNested*10000: 599.449ms
+benchNoirDeepNested*10000: 519.669ms
+benchPinoVeryDeepNested*10000: 569.447ms
+benchNoirVeryDeepNested*10000: 638.181ms
+benchPinoWildcardStructure*10000: 538.458ms
+benchNoirWildcards*10000: 624.209ms
+benchPinoFunctionCensor*10000: 375.109ms
+benchNoirFunctionCensor*10000: 462.107ms
 ```
 
 In these benchmarks, redacting top level keys adds no overhead to logging, redacting using wildcards in a deep nested structure adds 20% overhead.

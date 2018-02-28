@@ -86,7 +86,7 @@ var run = bench([
     }
     setImmediate(cb)
   },
-  function benchPinoFunctionCensor (cb) {
+  function benchNoirFunctionCensor (cb) {
     for (var i = 0; i < max; i++) {
       noirFunctionCensor.info({top: {nested: 'hello world'}})
     }
