@@ -10,7 +10,7 @@
     "test": "standard && tap test",
     "cov-badge": "tap --coverage-report=lcov && codecov -t 346eeb5b-38b7-4ff5-b0ec-eb2da6a1254f",
     "cov": "tap test --cov",
-    "benchmark": "node benchmarks ."
+    "benchmark": "node benchmarks"
   },
   "author": "David Mark Clements",
   "license": "MIT",
