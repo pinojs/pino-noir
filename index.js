@@ -46,7 +46,7 @@ function noir (serializers, keys, censor) {
   return shape
 
   function redact () { return {toJSON: mask} }
-  function mask () { return censor }
+  function mask (key) { return typeof censor === 'function' ? censor(this[key]) : censor }
 
   // we use eval to pre-compile the redactor function
   // this gives us up 100's of ms (per 10000ops) in some
@@ -169,7 +169,7 @@ function Redacted (val, key, parent, censor) {
 
 Redacted.prototype.toJSON = function toJSON () {
   this.parent[this.key] = this.val
-  return this.censor
+  return typeof this.censor === 'function' ? this.censor(this.val) : this.censor
 }
 
 module.exports = noir

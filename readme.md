@@ -27,6 +27,8 @@ The `censor` can be of any type, for instance an object like `{redacted: true}`
 is allowed, as is `null`. Explicitly passing `undefined` as the `censor` will
 in most cases cause the property to be stripped from the object. Edge cases occur when an array key is redacted, in which case `null` will appear in the array (this is ultimately a nuance of `JSON.stringify`, try `JSON.stringify(['a', undefined, 'c'])`)
 
+`censor` can also accept a function. This is helpful in cases where you want to redact dynamically instead of a fixed value. A common use case could be to mask partially (e.g. `{ test: 1234567890 }` => `{ "test": "xxxxxx7890" }`). Check the tests to see this in action.
+
 ### `serializers` (optional)
 
 An object containing a previous
@@ -57,6 +59,17 @@ pino.info({
   also: ['works', {with: 'arrays'}]
 })
 // {"pid":89590,"hostname":"x","level":30,"time":1475104592035,"key":"Ssshh!","path":{"to":{"key":"Ssshh!","another":"thing"},"leading":{"to":{"another":{"key":"Ssshh!"}}}},"check":{"out":"Ssshh!","wildards":"Ssshh!"},"also":["Ssshh!","Ssshh!"],"v":1}
+
+var redaction2 = noir(['key'], (val) => 'was ' + val.substr(-8))
+
+var pino2 = require('pino')({
+  serializers: redaction2
+})
+
+pino2.info({
+  key: 'will be redacted'
+})
+// {"pid":89590,"hostname":"x","level":30,"time":1475104592035,{"key":"was redacted"},"v":1}
 ```
 
 ## Pino Web Loggers
@@ -95,16 +108,18 @@ server.register({
 Overhead in benchmarks ranges from 0% to 20% depending on the case.
 
 ```
-benchPinoTopLevel*10000: 289.380ms
-benchNoirTopLevel*10000: 288.425ms
-benchPinoNested*10000: 327.763ms
-benchNoirNested*10000: 363.749ms
-benchPinoDeepNested*10000: 377.189ms
-benchNoirDeepNested*10000: 408.555ms
-benchPinoVeryDeepNested*10000: 441.848ms
-benchNoirVeryDeepNested*10000: 503.567ms
-benchPinoWildcardStructure*10000: 395.972ms
-benchNoirWildcards*10000: 476.951ms
+benchPinoTopLevel*10000: 293.869ms
+benchNoirTopLevel*10000: 367.033ms
+benchPinoNested*10000: 463.412ms
+benchNoirNested*10000: 441.725ms
+benchPinoDeepNested*10000: 599.449ms
+benchNoirDeepNested*10000: 519.669ms
+benchPinoVeryDeepNested*10000: 569.447ms
+benchNoirVeryDeepNested*10000: 638.181ms
+benchPinoWildcardStructure*10000: 538.458ms
+benchNoirWildcards*10000: 624.209ms
+benchPinoFunctionCensor*10000: 375.109ms
+benchNoirFunctionCensor*10000: 462.107ms
 ```
 
 In these benchmarks, redacting top level keys adds no overhead to logging, redacting using wildcards in a deep nested structure adds 20% overhead.

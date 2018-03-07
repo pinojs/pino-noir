@@ -21,6 +21,15 @@ test('masks according to supplied censor', function (t) {
   t.end()
 })
 
+test('masks according to supplied censor function', function (t) {
+  // this censor function can be anything. here we're just masking with 3 Xs and last 2 characters of given value.
+  var censor = function (val) { if (!val) return ''; return 'xxx' + val.substr(-2) }
+  var serializers = noir(['test1.test', 'test2'], censor)
+  t.is(stringify(serializers.test1({test: 'test', a: 1})), '{"test":"xxxst","a":1}')
+  t.is(stringify(serializers.test2({})), '""')
+  t.end()
+})
+
 test('redacts nested keys', function (t) {
   var serializers = noir(['test1.test', 'test2.testa.testb', 'test3[1]', 'test4[2].foo[3]'])
   t.is(stringify(serializers.test1({test: 'test', a: 1})), '{"test":"[Redacted]","a":1}')
