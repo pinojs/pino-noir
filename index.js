@@ -146,7 +146,7 @@ function set (o, p, v) {
 
 // any object created with prototype = null will crash server
 // use objectHasProp to use Object hasOwnProperty method
-function objectHasProp(obj, prop) {
+function objectHasProp (obj, prop) {
   return Object.prototype.hasOwnProperty.call(obj, prop)
 }
 
