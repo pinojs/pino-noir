@@ -39,6 +39,19 @@ test('redacts nested keys', function (t) {
   t.end()
 })
 
+test('test hasOwnProperty', function (t) {
+  var serializers = noir(['test1.test', 'test2.testa.testb'])
+  var obj1 = Object.create(null)
+  obj1.test = 'test'
+  obj1.a = 1
+  t.is(stringify(serializers.test1(obj1)), '{"test":"[Redacted]","a":1}')
+  var obj2 = Object.create(null)
+  obj2.testa = { testb: 'test', b: 2 }
+  obj2.a = 1
+  t.is(stringify(serializers.test2(obj2)), '{"testa":{"testb":"[Redacted]","b":2},"a":1}')
+  t.end()
+})
+
 test('handles paths that do not match', function (t) {
   t.is(stringify(noir(['top.shoe']).top({top: {very: {deep: {nested: 'hello world'}}}})), '{"top":{"very":{"deep":{"nested":"hello world"}}}}')
   t.is(stringify(noir(['top.deep.nested']).top({top: {very: {deep: {nested: 'hello world'}}}})), '{"top":{"very":{"deep":{"nested":"hello world"}}}}')
