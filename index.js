@@ -138,10 +138,16 @@ function set (o, p, v) {
     nv = v
     ov = n[k]
     nv = (i !== li) ? ov : nv
-    n[k] = (n.hasOwnProperty(k) && nv === ov || nv === undefined) ? n[k] : nv
+    n[k] = (objectHasProp(n, k) && nv === ov) || nv === undefined ? n[k] : nv
     n = n[k]
   }
   return o
+}
+
+// any object created with prototype = null will crash server
+// use objectHasProp to use Object hasOwnProperty method
+function objectHasProp (obj, prop) {
+  return Object.prototype.hasOwnProperty.call(obj, prop)
 }
 
 function strToPath (s) {
