@@ -2,6 +2,8 @@
 
 Redact sensitive information from your pino logs.
 
+Note: pino 5+ has built-in redaction using the [`redact`](https://github.com/pinojs/pino/blob/master/docs/redaction.md) config option. `pino-noir` provides the same functionality for pino 4 and below.
+
 🍾🍷
 
 [![codecov](https://codecov.io/gh/pinojs/pino-noir/branch/master/graph/badge.svg)](https://codecov.io/gh/pinojs/pino-noir)
