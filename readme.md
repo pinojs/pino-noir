@@ -6,8 +6,6 @@ Note: pino 5+ has built-in redaction using the [`redact`](https://github.com/pin
 
 🍾🍷
 
-[![codecov](https://codecov.io/gh/pinojs/pino-noir/branch/master/graph/badge.svg)](https://codecov.io/gh/pinojs/pino-noir)
-
 ## API
 
 ```js
