@@ -1,7 +1,8 @@
 'use strict'
 
-var DEFAULT_CENSOR = '[Redacted]'
-var rxProp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g
+const DEFAULT_CENSOR = '[Redacted]'
+// eslint-disable-next-line no-useless-backreference
+const rxProp = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(\.|\[\])(?:\4|$))/g
 
 function noir (serializers, keys, censor) {
   if (Array.isArray(serializers)) {
@@ -12,8 +13,8 @@ function noir (serializers, keys, censor) {
     censor = DEFAULT_CENSOR
   }
 
-  var shape = keys.map(strToPath).reduce(function (o, p) {
-    var k = p[0]
+  const shape = keys.map(strToPath).reduce(function (o, p) {
+    const k = p[0]
     if (!o[k]) o[k] = []
     o[k].push(p)
     return o
@@ -27,11 +28,11 @@ function noir (serializers, keys, censor) {
       shape[top] = factory(shape[top])
     }
 
-    var prev = shape[top]
-    var serializer = serializers[top]
+    const prev = shape[top]
+    const serializer = serializers[top]
     if (serializer) {
       shape[top] = function (obj) {
-        var intermediate = serializer(obj)
+        const intermediate = serializer(obj)
         return prev(intermediate)
       }
     }
@@ -45,7 +46,7 @@ function noir (serializers, keys, censor) {
 
   return shape
 
-  function redact () { return {toJSON: mask} }
+  function redact () { return { toJSON: mask } }
   function mask (key) { return typeof censor === 'function' ? censor(this[key]) : censor }
 
   // we use eval to pre-compile the redactor function
@@ -54,7 +55,7 @@ function noir (serializers, keys, censor) {
   // safe in this case, there is not user input here.
   /* eslint no-eval: 0 */
   function factory (paths) {
-    var redactor
+    let redactor
     eval('redactor = function redactor (o) { return redact(o, ' + JSON.stringify(paths) + ') }')
     redact() // shh linter
     return redactor
@@ -64,18 +65,18 @@ function noir (serializers, keys, censor) {
     // but doesn't seem to improve benchmarks
     function redact (o, paths) {
       if (o == null) return o
-      var i = 0
-      var len = paths.length
-      var path
-      var val
-      var key
-      var k
-      var parent
-      var pathIndex
-      var terminus
-      var cur
-      var pre
-      var red
+      let i = 0
+      const len = paths.length
+      let path
+      let val
+      let key
+      let k
+      let parent
+      let pathIndex
+      let terminus
+      let cur
+      let pre
+      let red
       for (; i < len; i++) {
         path = paths[i]
         pathIndex = 0
@@ -126,13 +127,13 @@ function redactAll (object, censor) {
 // n = nested, k = key, nv = newValue, ov = objValue
 /* eslint no-self-compare: 0, no-mixed-operators: 0 */
 function set (o, p, v) {
-  var i = -1
-  var l = p.length
-  var li = l - 1
-  var n = o
-  var k
-  var nv
-  var ov
+  let i = -1
+  const l = p.length
+  const li = l - 1
+  let n = o
+  let k
+  let nv
+  let ov
   while (n != null && ++i < l) {
     k = p[i]
     nv = v
@@ -151,7 +152,7 @@ function objectHasProp (obj, prop) {
 }
 
 function strToPath (s) {
-  var result = []
+  const result = []
   ;(s + '').replace(rxProp, function (match, number) {
     result.push(number || match)
   })
